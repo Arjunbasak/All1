@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Signal Board</title>
+    <!-- Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0e1118;
+            color: #ffffff;
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+        }
+        h2 { margin-bottom: 20px; font-size: 22px; color: #f1f1f1; }
+        
+        /* Tabs for Platforms */
+        .tab-container {
+            display: flex;
+            justify-content: space-around;
+            background: #171c26;
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 25px;
+            border: 1px solid #283042;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #8895b3;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .tab-btn.active[data-platform="quotex"] { background: #00e676; color: #000; }
+        .tab-btn.active[data-platform="binomo"] { background: #ffea00; color: #000; }
+        .tab-btn.active[data-platform="olymp"] { background: #00b0ff; color: #fff; }
+
+        /* Signal Cards */
+        .signal-list { display: flex; flex-direction: column; gap: 15px; }
+        .signal-card {
+            background: #171c26;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-left: 5px solid #283042;
+            display: none; /* Initially Hidden */
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Platform specific active borders */
+        .signal-card.quotex { border-left-color: #00e676; }
+        .signal-card.binomo { border-left-color: #ffea00; }
+        .signal-card.olymp { border-left-color: #00b0ff; }
+
+        .pair-name { font-size: 18px; font-weight: bold; text-align: left; margin: 0; }
+        .details { display: flex; justify-content: space-between; margin-top: 15px; font-size: 14px; color: #b0b9cd; }
+        
+        .direction { font-weight: bold; font-size: 16px; }
+        .up-signal { color: #00e676; }
+        .down-signal { color: #ff5252; }
+    </style>
+</head>
+<body>
+
+    <h2>📊 LIVE SIGNAL BOARD</h2>
+
+    <!-- Platform Tabs -->
+    <div class="tab-container">
+        <button class="tab-btn active" data-platform="quotex" onclick="switchPlatform('quotex')">Quotex</button>
+        <button class="tab-btn" data-platform="binomo" onclick="switchPlatform('binomo')">Binomo</button>
+        <button class="tab-btn" data-platform="olymp" onclick="switchPlatform('olymp')">Olymp Trade</button>
+    </div>
+
+    <!-- Signals Container -->
+    <div class="signal-list">
+        
+        <!-- Quotex Sample -->
+        <div class="signal-card quotex">
+            <p class="pair-name">AUD/USD (OTC)</p>
+            <div class="details">
+                <span>Type: <span class="direction up-signal">CALL / UP 📈</span></span>
+                <span>Expiry: 1 Min</span>
+            </div>
+        </div>
+
+        <!-- Binomo Sample -->
+        <div class="signal-card binomo">
+            <p class="pair-name">EUR/USD (OTC)</p>
+            <div class="details">
+                <span>Type: <span class="direction down-signal">PUT / DOWN 📉</span></span>
+                <span>Expiry: 5 Min</span>
+            </div>
+        </div>
+
+        <!-- Olymp Trade Sample -->
+        <div class="signal-card olymp">
+            <p class="pair-name">GBP/JPY</p>
+            <div class="details">
+                <span>Type: <span class="direction up-signal">CALL / UP 📈</span></span>
+                <span>Expiry: 3 Min</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Telegram Web App Initialize
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand(); // Full screen open karne ke liye
+
+        function switchPlatform(platform) {
+            // Active Tab Button Change Karein
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-platform="${platform}"]`).classList.add('active');
+
+            // Pehle saare cards ko hide karein
+            document.querySelectorAll('.signal-card').forEach(card => card.style.display = 'none');
+
+            // Sirf selected platform ke cards dikhayein
+            document.querySelectorAll(`.signal-card.${platform}`).forEach(card => card.style.display = 'block');
+        }
+
+        // Default screen load par Quotex dikhane ke liye
+        switchPlatform('quotex');
+    </script>
+</body>
+</html>
