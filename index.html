@@ -19,11 +19,11 @@
         .admin-detail { display: flex; justify-content: space-between; font-size: 13px; margin: 5px 0; color: #b0b9cd; }
         .admin-detail b { color: #ffffff; }
 
-        /* Social Links Buttons */
+        /* Social Links Buttons Fixed styling */
         .social-links { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
-        .social-btn { flex: 1; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; color: white; display: inline-block; text-align: center; }
-        .fb { background: #1877f2; }
-        .insta { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .social-btn { flex: 1; padding: 12px 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; color: white; display: inline-block; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .fb-btn { background: #1877f2; }
+        .insta-btn { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
 
         /* Tabs Styling */
         .tab-container { display: flex; justify-content: space-around; background: #171c26; border-radius: 12px; padding: 6px; margin-bottom: 20px; border: 1px solid #283042; }
@@ -41,11 +41,13 @@
 </head>
 <body>
 
+    <!-- Welcome Header -->
     <div class="welcome-box">
         <h1>Arjun VIP Signals</h1>
         <p>Premium Trading Analysis & Live Market Signals</p>
     </div>
 
+    <!-- Governor / Owner Details Info -->
     <div class="admin-box">
         <h3>Official Governor Details</h3>
         <div class="admin-detail"><span>Governor/Owner:</span> <b>Arjun Basak</b></div>
@@ -53,17 +55,20 @@
         <div class="admin-detail"><span>Official Email:</span> <b>arjuntrader79@gmail.com</b></div>
     </div>
 
+    <!-- Official Social Media Profiles -->
     <div class="social-links">
-        <a href="https://www.facebook.com/share/18dQR6eegQ/">Facebook Profile</a>
-        <a href="https://www.instagram.com/arjuntrader79?igsh=Y24yb3l1ZmVvNm9n">Instagram Page</a>
+        <a href="https://www.facebook.com/share/176AzeR3tj/" target="_blank" class="social-btn fb-btn">Facebook Profile</a>
+        <a href="https://www.instagram.com/arjuntrader79?igsh=Y24yb3l1ZmVvNm9n" target="_blank" class="social-btn insta-btn">Instagram Page</a>
     </div>
 
+    <!-- Platform Switcher Tabs -->
     <div class="tab-container">
         <button class="tab-btn active" data-platform="quotex" onclick="switchPlatform('quotex')">Quotex</button>
         <button class="tab-btn" data-platform="binomo" onclick="switchPlatform('binomo')">Binomo</button>
         <button class="tab-btn" data-platform="olymp" onclick="switchPlatform('olymp')">Olymp Trade</button>
     </div>
 
+    <!-- Live Active Signal Card Container -->
     <div id="signals-container"></div>
 
     <script>
