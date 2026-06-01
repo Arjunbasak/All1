@@ -100,9 +100,9 @@
             const container = document.getElementById('signals-container');
             container.innerHTML = '';
 
-            // Aapke liye auto-fill backup data
+            // Auto-Fill Data: Agar database khali hai toh ye automatic dikhega
             let dataToShow = allSignals;
-            if (!dataToShow || Object.keys(dataToShow).length === 0) {
+            if (!dataToShow || Object.keys(dataToShow).length === 0 || !dataToShow[currentPlatform]) {
                 dataToShow = {
                     "quotex": { "actual": { "pair": "AUD/USD (OTC)", "type": "CALL / UP 📈", "expiry": "1 Min" } },
                     "binomo": { "actual": { "pair": "EUR/USD", "type": "PUT / DOWN 📉", "expiry": "5 Min" } },
@@ -140,7 +140,7 @@
             fetch(firebaseURL)
                 .then(response => response.json())
                 .then(data => {
-                    allSignals = data;
+                    if(data) { allSignals = data; }
                     renderSignals();
                 })
                 .catch(err => {
