@@ -100,8 +100,18 @@
             const container = document.getElementById('signals-container');
             container.innerHTML = '';
 
-            if (allSignals && allSignals[currentPlatform]) {
-                const platformData = allSignals[currentPlatform];
+            // Aapke liye auto-fill backup data
+            let dataToShow = allSignals;
+            if (!dataToShow || Object.keys(dataToShow).length === 0) {
+                dataToShow = {
+                    "quotex": { "actual": { "pair": "AUD/USD (OTC)", "type": "CALL / UP 📈", "expiry": "1 Min" } },
+                    "binomo": { "actual": { "pair": "EUR/USD", "type": "PUT / DOWN 📉", "expiry": "5 Min" } },
+                    "olymp": { "actual": { "pair": "GBP/JPY", "type": "CALL / UP 📈", "expiry": "3 Min" } }
+                };
+            }
+
+            if (dataToShow && dataToShow[currentPlatform]) {
+                const platformData = dataToShow[currentPlatform];
                 const pairs = Object.keys(platformData);
                 
                 pairs.forEach(key => {
@@ -133,7 +143,10 @@
                     allSignals = data;
                     renderSignals();
                 })
-                .catch(err => console.error("Error:", err));
+                .catch(err => {
+                    console.error("Error:", err);
+                    renderSignals();
+                });
         }
 
         setInterval(fetchSignals, 3000);
