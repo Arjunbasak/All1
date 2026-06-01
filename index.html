@@ -6,88 +6,77 @@
     <title>Trading Signal Board</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0e1118;
-            color: #ffffff;
-            margin: 0;
-            padding: 15px;
-            text-align: center;
-        }
-        h2 { margin-bottom: 20px; font-size: 22px; color: #f1f1f1; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0e1118; color: #ffffff; margin: 0; padding: 15px; text-align: center; }
         
-        .tab-container {
-            display: flex;
-            justify-content: space-around;
-            background: #171c26;
-            border-radius: 12px;
-            padding: 6px;
-            margin-bottom: 25px;
-            border: 1px solid #283042;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            color: #8895b3;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
+        /* Premium Professional Header */
+        .welcome-box { background: linear-gradient(135deg, #171c26 0%, #1f2634 100%); padding: 22px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .welcome-box h1 { margin: 0; color: #00e676; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+        .welcome-box p { color: #8895b3; font-size: 13px; margin: 6px 0 0; font-style: italic; }
+
+        /* Governor / Admin Details Card */
+        .admin-box { background: #171c26; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2e3748; text-align: left; }
+        .admin-box h3 { margin: 0 0 8px 0; color: #00b0ff; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #283042; padding-bottom: 5px; }
+        .admin-detail { display: flex; justify-content: space-between; font-size: 13px; margin: 5px 0; color: #b0b9cd; }
+        .admin-detail b { color: #ffffff; }
+
+        /* Social Links Buttons */
+        .social-links { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
+        .social-btn { flex: 1; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; color: white; display: inline-block; transition: background 0.3s; text-align: center; }
+        .fb { background: #1877f2; }
+        .insta { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+
+        /* Tabs Styling */
+        .tab-container { display: flex; justify-content: space-around; background: #171c26; border-radius: 12px; padding: 6px; margin-bottom: 20px; border: 1px solid #283042; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #8895b3; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; }
         .tab-btn.active[data-platform="quotex"] { background: #00e676; color: #000; }
         .tab-btn.active[data-platform="binomo"] { background: #ffea00; color: #000; }
         .tab-btn.active[data-platform="olymp"] { background: #00b0ff; color: #fff; }
 
-        .signal-list { display: flex; flex-direction: column; gap: 15px; }
-        .signal-card {
-            background: #171c26;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border-left: 5px solid #283042;
-            display: none;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .signal-card.quotex { border-left-color: #00e676; }
-        .signal-card.binomo { border-left-color: #ffea00; }
-        .signal-card.olymp { border-left-color: #00b0ff; }
-
-        .pair-name { font-size: 18px; font-weight: bold; text-align: left; margin: 0; }
-        .details { display: flex; justify-content: space-between; margin-top: 15px; font-size: 14px; color: #b0b9cd; }
-        
-        .direction { font-weight: bold; font-size: 16px; }
-        .up-signal { color: #00e676; }
-        .down-signal { color: #ff5252; }
-        .no-signal { color: #8895b3; font-style: italic; padding: 20px; }
+        /* Signals Display Card */
+        .signal-card { background: #171c26; border-radius: 12px; padding: 22px; border-left: 5px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .pair-title { font-size: 19px; font-weight: bold; margin: 0; text-align: left; }
+        .up-signal { color: #00e676; font-weight: bold; }
+        .down-signal { color: #ff5252; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>📊 LIVE SIGNAL BOARD</h2>
+    <!-- Welcome Header -->
+    <div class="welcome-box">
+        <h1>Arjun VIP Signals</h1>
+        <p>Premium Trading Analysis & Live Market Signals</p>
+    </div>
 
+    <!-- Governor / Owner Details Info -->
+    <div class="admin-box">
+        <h3>Official Governor Details</h3>
+        <div class="admin-detail"><span>Governor/Owner:</span> <b>Arjun Basak</b></div>
+        <div class="admin-detail"><span>WhatsApp/Call:</span> <b>+91 8767812831</b></div>
+        <div class="admin-detail"><span>Official Email:</span> <b>arjuntrader@gmail.com</b></div>
+    </div>
+
+    <!-- Official Social Media Profiles -->
+    <div class="social-links">
+        <a href="https://www.facebook.com/share/1CFYHoVm3x/" target="_blank" class="social-btn fb">Facebook Profile</a>
+        <a href="https://www.instagram.com/arjun.basak.167?igsh=MWtxcm1pN3JjbGZ5Mw==" target="_blank" class="social-btn insta">Instagram Page</a>
+    </div>
+
+    <!-- Platform Switcher Tabs -->
     <div class="tab-container">
         <button class="tab-btn active" data-platform="quotex" onclick="switchPlatform('quotex')">Quotex</button>
         <button class="tab-btn" data-platform="binomo" onclick="switchPlatform('binomo')">Binomo</button>
         <button class="tab-btn" data-platform="olymp" onclick="switchPlatform('olymp')">Olymp Trade</button>
     </div>
 
-    <div class="signal-list" id="signals-container">
-        <p class="no-signal">Live signals ka wait ho raha hai...</p>
-    </div>
+    <!-- Live Active Signal Card Container -->
+    <div id="signals-container"></div>
 
     <script>
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
-
+        
         let currentPlatform = 'quotex';
         let allSignals = {};
-
-        const firebaseURL = "https://arjun-signals-default-rtdb.firebaseio.com/signals.json";
 
         function switchPlatform(platform) {
             currentPlatform = platform;
@@ -99,52 +88,47 @@
         function renderSignals() {
             const container = document.getElementById('signals-container');
             container.innerHTML = '';
-
-            // Auto-Fill Data: Agar database khali hai toh ye automatic dikhega
-            let dataToShow = allSignals;
-            if (!dataToShow || Object.keys(dataToShow).length === 0 || !dataToShow[currentPlatform]) {
-                dataToShow = {
-                    "quotex": { "actual": { "pair": "AUD/USD (OTC)", "type": "CALL / UP 📈", "expiry": "1 Min" } },
-                    "binomo": { "actual": { "pair": "EUR/USD", "type": "PUT / DOWN 📉", "expiry": "5 Min" } },
-                    "olymp": { "actual": { "pair": "GBP/JPY", "type": "CALL / UP 📈", "expiry": "3 Min" } }
-                };
+            
+            // Auto-fill fallback setup jab tak database khali hai
+            let sig = (allSignals[currentPlatform] ? allSignals[currentPlatform].actual : null);
+            
+            if (!sig) {
+                if (currentPlatform === 'quotex') {
+                    sig = { pair: "AUD/USD (OTC)", type: "CALL / UP 📈", expiry: "1 Min" };
+                } else if (currentPlatform === 'binomo') {
+                    sig = { pair: "EUR/USD", type: "PUT / DOWN 📉", expiry: "5 Min" };
+                } else {
+                    sig = { pair: "GBP/JPY", type: "CALL / UP 📈", expiry: "3 Min" };
+                }
             }
+            
+            const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call');
+            const dirClass = isUp ? 'up-signal' : 'down-signal';
+            
+            let sideColor = '#00e676';
+            if (currentPlatform === 'binomo') sideColor = '#ffea00';
+            if (currentPlatform === 'olymp') sideColor = '#00b0ff';
 
-            if (dataToShow && dataToShow[currentPlatform]) {
-                const platformData = dataToShow[currentPlatform];
-                const pairs = Object.keys(platformData);
-                
-                pairs.forEach(key => {
-                    const sig = platformData[key];
-                    const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call');
-                    const dirClass = isUp ? 'up-signal' : 'down-signal';
-
-                    const card = document.createElement('div');
-                    card.className = `signal-card ${currentPlatform}`;
-                    card.style.display = 'block';
-                    card.innerHTML = `
-                        <p class="pair-name">${sig.pair}</p>
-                        <div class="details">
-                            <span>Type: <span class="direction ${dirClass}">${sig.type}</span></span>
-                            <span>Expiry: ${sig.expiry}</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            } else {
-                container.innerHTML = `<p class="no-signal">Abhi ${currentPlatform.toUpperCase()} ke liye koi live signal nahi hai.</p>`;
-            }
+            container.innerHTML = `
+                <div class="signal-card" style="border-left-color: ${sideColor}">
+                    <p class="pair-title">${sig.pair}</p>
+                    <div style="display:flex; justify-content:space-between; margin-top:15px; font-size: 14px;">
+                        <span>Type: <span class="${dirClass}">${sig.type}</span></span>
+                        <span style="color: #b0b9cd;">Expiry: <b>${sig.expiry}</b></span>
+                    </div>
+                </div>
+            `;
         }
 
         function fetchSignals() {
-            fetch(firebaseURL)
-                .then(response => response.json())
-                .then(data => {
-                    if(data) { allSignals = data; }
-                    renderSignals();
+            fetch("https://arjun-signals-default-rtdb.firebaseio.com/signals.json")
+                .then(r => r.json())
+                .then(d => { 
+                    if(d) { allSignals = d; }
+                    renderSignals(); 
                 })
                 .catch(err => {
-                    console.error("Error:", err);
+                    console.error(err);
                     renderSignals();
                 });
         }
