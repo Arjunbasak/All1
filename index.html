@@ -87,7 +87,6 @@
         let currentPlatform = 'quotex';
         let allSignals = {};
 
-        // Aapka Firebase URL yahan connect hai
         const firebaseURL = "https://arjun-signals-default-rtdb.firebaseio.com/signals.json";
 
         function switchPlatform(platform) {
@@ -127,7 +126,6 @@
             }
         }
 
-        // Har 3 second mein Firebase se naya data check karne ke liye
         function fetchSignals() {
             fetch(firebaseURL)
                 .then(response => response.json())
