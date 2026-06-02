@@ -34,11 +34,19 @@
         .tab-btn.active[data-platform="binomo"] { background: #ffea00; color: #000; }
         .tab-btn.active[data-platform="olymp"] { background: #00b0ff; color: #fff; }
 
+        /* Signals Display List Container */
+        #signals-container { display: flex; flex-direction: column; gap: 12px; }
+
         /* Signals Display Card */
-        .signal-card { background: #171c26; border-radius: 12px; padding: 22px; border-left: 5px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+        .signal-card { background: #171c26; border-radius: 12px; padding: 22px; border-left: 5px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; animation: fadeIn 0.5s ease-in-out; }
         .pair-title { font-size: 19px; font-weight: bold; margin: 0; text-align: left; }
         .up-signal { color: #00e676; font-weight: bold; }
         .down-signal { color: #ff5252; font-weight: bold; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -78,7 +86,53 @@
         window.Telegram.WebApp.expand();
         
         let currentPlatform = 'quotex';
-        let allSignals = {};
+        let firebaseData = {};
+
+        // 37+ Assets + New Screenshot Assets Added
+        const supportedPairs = {
+            // New Assets From Screenshots
+            "CRYPTOIDX": "Crypto IDX", "BITCOINCASHOTC": "Bitcoin Cash (OTC)", "UNISWAPOTC": "Uniswap (OTC)",
+            "PANCAKESWAPOTC": "Pancake Swap (OTC)", "SOLANAOTC": "Solana (OTC)", "ETHEREUMOTC": "Ethereum (OTC)",
+            "AAVE": "Aave", "BITCOIN": "Bitcoin", "CARDANO": "Cardano", "CHAINLINK": "Chainlink",
+            
+            // From Images (AUD, CAD, CHF, EUR, GBP, NZD, USD series)
+            "AUDCAD": "AUD/CAD", "AUDCHF": "AUD/CHF", "AUDDKK": "AUD/DKK", "AUDHUF": "AUD/HUF", 
+            "AUDJPY": "AUD/JPY", "AUDNOK": "AUD/NOK", "AUDNZD": "AUD/NZD", "AUDSEK": "AUD/SEK", 
+            "AUDSGD": "AUD/SGD", "AUDUSD": "AUD/USD", "AUDZAR": "AUD/ZAR",
+            "CADDKK": "CAD/DKK", "CADJPY": "CAD/JPY", "CADMXN": "CAD/MXN", "CADNOK": "CAD/NOK", 
+            "CADSEK": "CAD/SEK", "CADSGD": "CAD/SGD",
+            "CHFDKK": "CHF/DKK", "CHFJPY": "CHF/JPY", "CHFNOK": "CHF/NOK", "CHFPLN": "CHF/PLN", 
+            "CHFSEK": "CHF/SEK", "CHFSGD": "CHF/SGD", "CHFHUF": "CHF/HUF",
+            "EURHUF": "EUR/HUF", "EURILS": "EUR/ILS", "EURJPY": "EUR/JPY", "EURMXN": "EUR/MXN", 
+            "EURNOK": "EUR/NOK", "EURNZD": "EUR/NZD", "EURSEK": "EUR/SEK", "EURSGD": "EUR/SGD", 
+            "EURUSD": "EUR/USD", "EURZAR": "EUR/ZAR", "EURPLN": "EUR/PLN",
+            "GBPCAD": "GBP/CAD", "GBPCZK": "GBP/CZK", "GBPDKK": "GBP/DKK", "GBPHKD": "GBP/HKD", 
+            "GBPMXN": "GBP/MXN", "GBPNOK": "GBP/NOK", "GBPNZD": "GBP/NZD", "GBPPLN": "GBP/PLN", 
+            "GBPSGD": "GBP/SGD", "GBPTRY": "GBP/TRY", "GBPUSD": "GBP/USD", "GBPHUF": "GBP/HUF",
+            "NOKJPY": "NOK/JPY", "NOKSEK": "NOK/SEK",
+            "NZDCAD": "NZD/CAD", "NZDCHF": "NZD/CHF", "NZDDKK": "NZD/DKK", "NZDHUF": "NZD/HUF", 
+            "NZDJPY": "NZD/JPY", "NZDNOK": "NZD/NOK", "NZDSEK": "NZD/SEK", "NZDSGD": "NZD/SGD", 
+            "NZDUSD": "NZD/USD",
+            "SEKJPY": "SEK/JPY", "SGDHKD": "SGD/HKD", "SGDJPY": "SGD/JPY",
+            "USDCAD": "USD/CAD", "USDCHF": "USD/CHF", "USDCZK": "USD/CZK", "USDHUF": "USD/HUF", 
+            "USDILS": "USD/ILS", "USDJPY": "USD/JPY", "USDMXN": "USD/MXN", "USDPLN": "USD/PLN", 
+            "USDSEK": "USD/SEK", "USDZAR": "USD/ZAR", "ZARJPY": "ZAR/JPY",
+
+            // Previous OTC Grid List
+            "AUDCADOTC": "AUD/CAD OTC", "AUDCHFOTC": "AUD/CHF OTC", "AUDJPYOTC": "AUD/JPY OTC",
+            "AUDNZDOTC": "AUD/NZD OTC", "AUDUSDOTC": "AUD/USD OTC", "CADCHFOTC": "CAD/CHF OTC",
+            "CADJPYOTC": "CAD/JPY OTC", "CHFJPYOTC": "CHF/JPY OTC", "EURAUDOTC": "EUR/AUD OTC",
+            "EURCADOTC": "EUR/CAD OTC", "EURCHFOTC": "EUR/CHF OTC", "EURGBPOTC": "EUR/GBP OTC",
+            "EURJPYOTC": "EUR/JPY OTC", "EURNZDOTC": "EUR/NZD OTC", "EURUSDOTC": "EUR/USD OTC",
+            "GBPAUDOTC": "GBP/AUD OTC", "GBPCADOTC": "GBP/CAD OTC", "GBPCHFOTC": "GBP/CHF OTC",
+            "GBPJPYOTC": "GBP/JPY OTC", "GBPNZDOTC": "GBP/NZD OTC", "GBPUSDOTC": "GBP/USD OTC",
+            "NZDCADOTC": "NZD/CAD OTC", "NZDCHFOTC": "NZD/CHF OTC", "NZDJPYOTC": "NZD/JPY OTC",
+            "NZDUSDOTC": "NZD/USD OTC", "USDARSOTC": "USD/ARS OTC", "USDBDTOTC": "USD/BDT OTC",
+            "USDBRLOTC": "USD/BRL OTC", "USDCHFOTC": "USD/CHF OTC", "USDIDROTC": "USD/IDR OTC",
+            "USDINROTC": "USD/INR OTC", "USDJPYOTC": "USD/JPY OTC", "USDMXNOTC": "USD/MXN OTC",
+            "USDPKROTC": "USD/PKR OTC", "USDPHPOTC": "USD/PHP OTC", "USDZAROTC": "USD/ZAR OTC",
+            "GOLDOTC": "GOLD OTC", "SILVEROTC": "SILVER OTC"
+        };
 
         function switchPlatform(platform) {
             currentPlatform = platform;
@@ -91,46 +145,68 @@
             const container = document.getElementById('signals-container');
             container.innerHTML = '';
             
-            // Fixed: Pehle seedha platform key check karega, agar usme data nahi hai toh fallback system chalega
-            let sig = null;
-            if (allSignals && allSignals[currentPlatform]) {
-                sig = allSignals[currentPlatform].actual ? allSignals[currentPlatform].actual : allSignals[currentPlatform];
+            let signalList = [];
+
+            // 1. Firebase Live Read Loop
+            if (firebaseData && typeof firebaseData === 'object') {
+                Object.keys(firebaseData).forEach(key => {
+                    let item = firebaseData[key];
+                    if (item && item[currentPlatform]) {
+                        signalList.push(item[currentPlatform]);
+                    } else if (item && item.actual && item.actual[currentPlatform]) {
+                        signalList.push(item.actual[currentPlatform]);
+                    } else if (key === currentPlatform && item.pair) {
+                        signalList.push(item);
+                    }
+                });
             }
             
-            // Fallback (Agar database khali ho toh default signals dikhane ke liye)
-            if (!sig || !sig.pair) {
-                if (currentPlatform === 'quotex') {
-                    sig = { pair: "AUD/USD (OTC)", type: "CALL / UP 📈", expiry: "1 Min" };
-                } else if (currentPlatform === 'binomo') {
-                    sig = { pair: "EUR/USD", type: "PUT / DOWN 📉", expiry: "5 Min" };
-                } else {
-                    sig = { pair: "GBP/JPY", type: "CALL / UP 📈", expiry: "3 Min" };
-                }
+            // 2. Dynamic Fallback System using new assets
+            if (signalList.length === 0) {
+                let defaultExpiry = currentPlatform === 'binomo' ? '5 Min' : (currentPlatform === 'quotex' ? '1 Min' : '3 Min');
+                
+                // Screenshots ke standard aur customized assets ko placeholder list banaya
+                let imageFallbackKeys = ['CRYPTOIDX', 'EURUSD', 'AUDCAD', 'USDJPY'];
+                imageFallbackKeys.forEach((key, index) => {
+                    if (supportedPairs[key]) {
+                        signalList.push({
+                            pair: supportedPairs[key],
+                            type: index % 2 === 0 ? "CALL / UP 📈" : "PUT / DOWN 📉",
+                            expiry: defaultExpiry
+                        });
+                    }
+                });
             }
-            
-            const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call') || sig.type.toLowerCase().includes('buy');
-            const dirClass = isUp ? 'up-signal' : 'down-signal';
-            
+
             let sideColor = '#00e676';
             if (currentPlatform === 'binomo') sideColor = '#ffea00';
             if (currentPlatform === 'olymp') sideColor = '#00b0ff';
 
-            container.innerHTML = `
-                <div class="signal-card" style="border-left-color: ${sideColor}">
-                    <p class="pair-title">${sig.pair}</p>
-                    <div style="display:flex; justify-content:space-between; margin-top:15px; font-size: 14px;">
-                        <span>Type: <span class="${dirClass}">${sig.type}</span></span>
-                        <span style="color: #b0b9cd;">Expiry: <b>${sig.expiry}</b></span>
-                    </div>
-                </div>
-            `;
+            // DOM Insertion Loop
+            signalList.forEach(sig => {
+                if(sig && sig.pair && sig.type) {
+                    const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call') || sig.type.toLowerCase().includes('buy');
+                    const dirClass = isUp ? 'up-signal' : 'down-signal';
+
+                    const cardHtml = `
+                        <div class="signal-card" style="border-left-color: ${sideColor}">
+                            <p class="pair-title">${sig.pair}</p>
+                            <div style="display:flex; justify-content:space-between; margin-top:15px; font-size: 14px;">
+                                <span>Type: <span class="${dirClass}">${sig.type}</span></span>
+                                <span style="color: #b0b9cd;">Expiry: <b>${sig.expiry}</b></span>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += cardHtml;
+                }
+            });
         }
 
         function fetchSignals() {
             fetch("https://arjun-signals-default-rtdb.firebaseio.com/signals.json")
                 .then(r => r.json())
                 .then(d => { 
-                    if(d) { allSignals = d; }
+                    if(d) { firebaseData = d; }
                     renderSignals(); 
                 })
                 .catch(err => {
@@ -139,7 +215,6 @@
                 });
         }
 
-        // Har 3 seconds mein data automatic auto-refresh hoga
         setInterval(fetchSignals, 3000);
         fetchSignals();
     </script>
