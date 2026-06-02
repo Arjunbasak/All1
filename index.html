@@ -63,7 +63,7 @@
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
         
-        let currentPlatform = 'binomo'; // Default platform shifted to Binomo as per your requirement
+        let currentPlatform = 'binomo';
         let firebaseData = {};
 
         const supportedPairs = {
@@ -86,19 +86,26 @@
             if (firebaseData && typeof firebaseData === 'object') {
                 Object.keys(firebaseData).forEach(key => {
                     let item = firebaseData[key];
-                    if (item && item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
-                        signalList.push(item);
+                    if (item) {
+                        // Check direct platform match or nested objects
+                        if (item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
+                            signalList.push(item);
+                        } else if (item[currentPlatform] && item[currentPlatform].pair) {
+                            signalList.push(item[currentPlatform]);
+                        } else if (key.toLowerCase() === currentPlatform.toLowerCase() && item.pair) {
+                            signalList.push(item);
+                        }
                     }
                 });
             }
             
-            // Fixed Fallback - Ab purane fake/dummy cards nahi dikhenge
+            // Agar koi live signal nahi hai, toh hi screen khaali dikhegi (No dummy cards)
             if (signalList.length === 0) {
                 container.innerHTML = '<div class="no-signals">⏳ Waiting for live TradingView Alerts...</div>';
                 return;
             }
 
-            let sideColor = '#ffea00'; // Binomo default yellow color
+            let sideColor = '#ffea00';
             if (currentPlatform === 'quotex') sideColor = '#00e676';
             if (currentPlatform === 'olymp') sideColor = '#00b0ff';
 
