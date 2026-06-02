@@ -7,57 +7,38 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0e1118; color: #ffffff; margin: 0; padding: 15px; text-align: center; }
-        
-        /* Premium Professional Header */
         .welcome-box { background: linear-gradient(135deg, #171c26 0%, #1f2634 100%); padding: 22px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .welcome-box h1 { margin: 0; color: #00e676; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
         .welcome-box p { color: #8895b3; font-size: 13px; margin: 6px 0 0; font-style: italic; }
-
-        /* Governor / Admin Details Card */
         .admin-box { background: #171c26; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2e3748; text-align: left; }
         .admin-box h3 { margin: 0 0 8px 0; color: #00b0ff; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #283042; padding-bottom: 5px; }
         .admin-detail { display: flex; justify-content: space-between; font-size: 13px; margin: 5px 0; color: #b0b9cd; }
         .admin-detail b { color: #ffffff; }
-
-        /* Social Links Buttons Fixed styling */
         .social-links { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
         .social-btn { flex: 1; padding: 12px 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; color: white; display: inline-block; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .fb-btn { background: #1877f2; }
         .insta-btn { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-
-        /* Tabs Styling */
         .tab-container { display: flex; justify-content: space-around; background: #171c26; border-radius: 12px; padding: 6px; margin-bottom: 20px; border: 1px solid #283042; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #8895b3; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: all 0.3s ease; }
-        
-        /* Fixed Active State Colors */
         .tab-btn.active[data-platform="quotex"] { background: #00e676; color: #000; }
         .tab-btn.active[data-platform="binomo"] { background: #ffea00; color: #000; }
         .tab-btn.active[data-platform="olymp"] { background: #00b0ff; color: #fff; }
-
-        /* Signals Display List Container */
         #signals-container { display: flex; flex-direction: column; gap: 12px; }
-
-        /* Signals Display Card */
         .signal-card { background: #171c26; border-radius: 12px; padding: 22px; border-left: 5px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; animation: fadeIn 0.5s ease-in-out; }
         .pair-title { font-size: 19px; font-weight: bold; margin: 0; text-align: left; }
         .up-signal { color: #00e676; font-weight: bold; }
         .down-signal { color: #ff5252; font-weight: bold; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .no-signals { padding: 30px; color: #8895b3; font-size: 14px; background: #171c26; border-radius: 12px; border: 1px dashed #283042; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- Welcome Header -->
     <div class="welcome-box">
         <h1>Arjun VIP Signals</h1>
         <p>Premium Trading Analysis & Live Market Signals</p>
     </div>
 
-    <!-- Governor / Owner Details Info -->
     <div class="admin-box">
         <h3>Official Governor Details</h3>
         <div class="admin-detail"><span>Governor/Owner:</span> <b>Arjun Basak</b></div>
@@ -65,67 +46,29 @@
         <div class="admin-detail"><span>Official Email:</span> <b>arjuntrader79@gmail.com</b></div>
     </div>
 
-    <!-- Official Social Media Profiles -->
     <div class="social-links">
         <a href="https://www.facebook.com/share/176AzeR3tj/" target="_blank" class="social-btn fb-btn">Facebook Profile</a>
         <a href="https://www.instagram.com/arjuntrader79?igsh=Y24yb3l1ZmVvNm9n" target="_blank" class="social-btn insta-btn">Instagram Page</a>
     </div>
 
-    <!-- Platform Switcher Tabs -->
     <div class="tab-container">
-        <button class="tab-btn active" data-platform="quotex" onclick="switchPlatform('quotex')">Quotex</button>
-        <button class="tab-btn" data-platform="binomo" onclick="switchPlatform('binomo')">Binomo</button>
+        <button class="tab-btn" data-platform="quotex" onclick="switchPlatform('quotex')">Quotex</button>
+        <button class="tab-btn active" data-platform="binomo" onclick="switchPlatform('binomo')">Binomo</button>
         <button class="tab-btn" data-platform="olymp" onclick="switchPlatform('olymp')">Olymp Trade</button>
     </div>
 
-    <!-- Live Active Signal Card Container -->
     <div id="signals-container"></div>
 
     <script>
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
         
-        let currentPlatform = 'quotex';
+        let currentPlatform = 'binomo'; // Default platform shifted to Binomo as per your requirement
         let firebaseData = {};
 
-        // 37+ Assets Dictionary
         const supportedPairs = {
-            "CRYPTOIDX": "Crypto IDX", "BITCOINCASHOTC": "Bitcoin Cash (OTC)", "UNISWAPOTC": "Uniswap (OTC)",
-            "PANCAKESWAPOTC": "Pancake Swap (OTC)", "SOLANAOTC": "Solana (OTC)", "ETHEREUMOTC": "Ethereum (OTC)",
-            "AAVE": "Aave", "BITCOIN": "Bitcoin", "CARDANO": "Cardano", "CHAINLINK": "Chainlink",
-            "AUDCAD": "AUD/CAD", "AUDCHF": "AUD/CHF", "AUDDKK": "AUD/DKK", "AUDHUF": "AUD/HUF", 
-            "AUDJPY": "AUD/JPY", "AUDNOK": "AUD/NOK", "AUDNZD": "AUD/NZD", "AUDSEK": "AUD/SEK", 
-            "AUDSGD": "AUD/SGD", "AUDUSD": "AUD/USD", "AUDZAR": "AUD/ZAR",
-            "CADDKK": "CAD/DKK", "CADJPY": "CAD/JPY", "CADMXN": "CAD/MXN", "CADNOK": "CAD/NOK", 
-            "CADSEK": "CAD/SEK", "CADSGD": "CAD/SGD",
-            "CHFDKK": "CHF/DKK", "CHFJPY": "CHF/JPY", "CHFNOK": "CHF/NOK", "CHFPLN": "CHF/PLN", 
-            "CHFSEK": "CHF/SEK", "CHFSGD": "CHF/SGD", "CHFHUF": "CHF/HUF",
-            "EURHUF": "EUR/HUF", "EURILS": "EUR/ILS", "EURJPY": "EUR/JPY", "EURMXN": "EUR/MXN", 
-            "EURNOK": "EUR/NOK", "EURNZD": "EUR/NZD", "EURSEK": "EUR/SEK", "EURSGD": "EUR/SGD", 
-            "EURUSD": "EUR/USD", "EURZAR": "EUR/ZAR", "EURPLN": "EUR/PLN",
-            "GBPCAD": "GBP/CAD", "GBPCZK": "GBP/CZK", "GBPDKK": "GBP/DKK", "GBPHKD": "GBP/HKD", 
-            "GBPMXN": "GBP/MXN", "GBPNOK": "GBP/NOK", "GBPNZD": "GBP/NZD", "GBPPLN": "GBP/PLN", 
-            "GBPSGD": "GBP/SGD", "GBPTRY": "GBP/TRY", "GBPUSD": "GBP/USD", "GBPHUF": "GBP/HUF",
-            "NOKJPY": "NOK/JPY", "NOKSEK": "NOK/SEK",
-            "NZDCAD": "NZD/CAD", "NZDCHF": "NZD/CHF", "NZDDKK": "NZD/DKK", "NZDHUF": "NZD/HUF", 
-            "NZDJPY": "NZD/JPY", "NZDNOK": "NZD/NOK", "NZDSEK": "NZD/SEK", "NZDSGD": "NZD/SGD", 
-            "NZDUSD": "NZD/USD", "SEKJPY": "SEK/JPY", "SGDHKD": "SGD/HKD", "SGDJPY": "SGD/JPY",
-            "USDCAD": "USD/CAD", "USDCHF": "USD/CHF", "USDCZK": "USD/CZK", "USDHUF": "USD/HUF", 
-            "USDILS": "USD/ILS", "USDJPY": "USD/JPY", "USDMXN": "USD/MXN", "USDPLN": "USD/PLN", 
-            "USDSEK": "USD/SEK", "USDZAR": "USD/ZAR", "ZARJPY": "ZAR/JPY",
-            "AUDCADOTC": "AUD/CAD OTC", "AUDCHFOTC": "AUD/CHF OTC", "AUDJPYOTC": "AUD/JPY OTC",
-            "AUDNZDOTC": "AUD/NZD OTC", "AUDUSDOTC": "AUD/USD OTC", "CADCHFOTC": "CAD/CHF OTC",
-            "CADJPYOTC": "CAD/JPY OTC", "CHFJPYOTC": "CHF/JPY OTC", "EURAUDOTC": "EUR/AUD OTC",
-            "EURCADOTC": "EUR/CAD OTC", "EURCHFOTC": "EUR/CHF OTC", "EURGBPOTC": "EUR/GBP OTC",
-            "EURJPYOTC": "EUR/JPY OTC", "EURNZDOTC": "EUR/NZD OTC", "EURUSDOTC": "EUR/USD OTC",
-            "GBPAUDOTC": "GBP/AUD OTC", "GBPCADOTC": "GBP/CAD OTC", "GBPCHFOTC": "GBP/CHF OTC",
-            "GBPJPYOTC": "GBP/JPY OTC", "GBPNZDOTC": "GBP/NZD OTC", "GBPUSDOTC": "GBP/USD OTC",
-            "NZDCADOTC": "NZD/CAD OTC", "NZDCHFOTC": "NZD/CHF OTC", "NZDJPYOTC": "NZD/JPY OTC",
-            "NZDUSDOTC": "NZD/USD OTC", "USDARSOTC": "USD/ARS OTC", "USDBDTOTC": "USD/BDT OTC",
-            "USDBRLOTC": "USD/BRL OTC", "USDCHFOTC": "USD/CHF OTC", "USDIDROTC": "USD/IDR OTC",
-            "USDINROTC": "USD/INR OTC", "USDJPYOTC": "USD/JPY OTC", "USDMXNOTC": "USD/MXN OTC",
-            "USDPKROTC": "USD/PKR OTC", "USDPHPOTC": "USD/PHP OTC", "USDZAROTC": "USD/ZAR OTC",
-            "GOLDOTC": "GOLD OTC", "SILVEROTC": "SILVER OTC"
+            "SAXOCADSEK": "CAD/SEK", "CADSEK": "CAD/SEK",
+            "CRYPTOIDX": "Crypto IDX", "AUDCAD": "AUD/CAD", "EURUSD": "EUR/USD", "USDJPY": "USD/JPY"
         };
 
         function switchPlatform(platform) {
@@ -138,53 +81,32 @@
         function renderSignals() {
             const container = document.getElementById('signals-container');
             container.innerHTML = '';
-            
             let signalList = [];
 
-            // Firebase data parsing according to platforms
             if (firebaseData && typeof firebaseData === 'object') {
                 Object.keys(firebaseData).forEach(key => {
                     let item = firebaseData[key];
-                    if (item) {
-                        // Agar direct field mein target platform match hota hai
-                        if (item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
-                            signalList.push(item);
-                        } 
-                        // Backup check agar purana data tree layout mein ho
-                        else if (item[currentPlatform]) {
-                            signalList.push(item[currentPlatform]);
-                        } else if (key === currentPlatform && item.pair) {
-                            signalList.push(item);
-                        }
+                    if (item && item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
+                        signalList.push(item);
                     }
                 });
             }
             
-            // Dynamic Fallback System
+            // Fixed Fallback - Ab purane fake/dummy cards nahi dikhenge
             if (signalList.length === 0) {
-                let defaultExpiry = currentPlatform === 'binomo' ? '5 Min' : (currentPlatform === 'quotex' ? '1 Min' : '3 Min');
-                let imageFallbackKeys = ['CRYPTOIDX', 'EURUSD', 'AUDCAD', 'USDJPY'];
-                imageFallbackKeys.forEach((key, index) => {
-                    if (supportedPairs[key]) {
-                        signalList.push({
-                            pair: supportedPairs[key],
-                            type: index % 2 === 0 ? "CALL / UP 📈" : "PUT / DOWN 📉",
-                            expiry: defaultExpiry
-                        });
-                    }
-                });
+                container.innerHTML = '<div class="no-signals">⏳ Waiting for live TradingView Alerts...</div>';
+                return;
             }
 
-            let sideColor = '#00e676';
-            if (currentPlatform === 'binomo') sideColor = '#ffea00';
+            let sideColor = '#ffea00'; // Binomo default yellow color
+            if (currentPlatform === 'quotex') sideColor = '#00e676';
             if (currentPlatform === 'olymp') sideColor = '#00b0ff';
 
             signalList.forEach(sig => {
                 if(sig && sig.pair && sig.type) {
-                    const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call') || sig.type.toLowerCase().includes('buy');
+                    const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call');
                     const dirClass = isUp ? 'up-signal' : 'down-signal';
 
-                    // Formatting clean name mapping
                     let cleanPair = sig.pair;
                     let upperKey = sig.pair.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
                     if (supportedPairs[upperKey]) {
@@ -213,12 +135,12 @@
                     renderSignals(); 
                 })
                 .catch(err => {
-                    console.error("Firebase Fetch Error:", err);
+                    console.error("Firebase Error:", err);
                     renderSignals();
                 });
         }
 
-        setInterval(fetchSignals, 3000);
+        setInterval(fetchSignals, 2000);
         fetchSignals();
     </script>
 </body>
