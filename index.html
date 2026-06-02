@@ -88,14 +88,11 @@
         let currentPlatform = 'quotex';
         let firebaseData = {};
 
-        // 37+ Assets + New Screenshot Assets Added
+        // 37+ Assets Dictionary
         const supportedPairs = {
-            // New Assets From Screenshots
             "CRYPTOIDX": "Crypto IDX", "BITCOINCASHOTC": "Bitcoin Cash (OTC)", "UNISWAPOTC": "Uniswap (OTC)",
             "PANCAKESWAPOTC": "Pancake Swap (OTC)", "SOLANAOTC": "Solana (OTC)", "ETHEREUMOTC": "Ethereum (OTC)",
             "AAVE": "Aave", "BITCOIN": "Bitcoin", "CARDANO": "Cardano", "CHAINLINK": "Chainlink",
-            
-            // From Images (AUD, CAD, CHF, EUR, GBP, NZD, USD series)
             "AUDCAD": "AUD/CAD", "AUDCHF": "AUD/CHF", "AUDDKK": "AUD/DKK", "AUDHUF": "AUD/HUF", 
             "AUDJPY": "AUD/JPY", "AUDNOK": "AUD/NOK", "AUDNZD": "AUD/NZD", "AUDSEK": "AUD/SEK", 
             "AUDSGD": "AUD/SGD", "AUDUSD": "AUD/USD", "AUDZAR": "AUD/ZAR",
@@ -112,13 +109,10 @@
             "NOKJPY": "NOK/JPY", "NOKSEK": "NOK/SEK",
             "NZDCAD": "NZD/CAD", "NZDCHF": "NZD/CHF", "NZDDKK": "NZD/DKK", "NZDHUF": "NZD/HUF", 
             "NZDJPY": "NZD/JPY", "NZDNOK": "NZD/NOK", "NZDSEK": "NZD/SEK", "NZDSGD": "NZD/SGD", 
-            "NZDUSD": "NZD/USD",
-            "SEKJPY": "SEK/JPY", "SGDHKD": "SGD/HKD", "SGDJPY": "SGD/JPY",
+            "NZDUSD": "NZD/USD", "SEKJPY": "SEK/JPY", "SGDHKD": "SGD/HKD", "SGDJPY": "SGD/JPY",
             "USDCAD": "USD/CAD", "USDCHF": "USD/CHF", "USDCZK": "USD/CZK", "USDHUF": "USD/HUF", 
             "USDILS": "USD/ILS", "USDJPY": "USD/JPY", "USDMXN": "USD/MXN", "USDPLN": "USD/PLN", 
             "USDSEK": "USD/SEK", "USDZAR": "USD/ZAR", "ZARJPY": "ZAR/JPY",
-
-            // Previous OTC Grid List
             "AUDCADOTC": "AUD/CAD OTC", "AUDCHFOTC": "AUD/CHF OTC", "AUDJPYOTC": "AUD/JPY OTC",
             "AUDNZDOTC": "AUD/NZD OTC", "AUDUSDOTC": "AUD/USD OTC", "CADCHFOTC": "CAD/CHF OTC",
             "CADJPYOTC": "CAD/JPY OTC", "CHFJPYOTC": "CHF/JPY OTC", "EURAUDOTC": "EUR/AUD OTC",
@@ -147,25 +141,28 @@
             
             let signalList = [];
 
-            // 1. Firebase Live Read Loop
+            // Firebase data parsing according to platforms
             if (firebaseData && typeof firebaseData === 'object') {
                 Object.keys(firebaseData).forEach(key => {
                     let item = firebaseData[key];
-                    if (item && item[currentPlatform]) {
-                        signalList.push(item[currentPlatform]);
-                    } else if (item && item.actual && item.actual[currentPlatform]) {
-                        signalList.push(item.actual[currentPlatform]);
-                    } else if (key === currentPlatform && item.pair) {
-                        signalList.push(item);
+                    if (item) {
+                        // Agar direct field mein target platform match hota hai
+                        if (item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
+                            signalList.push(item);
+                        } 
+                        // Backup check agar purana data tree layout mein ho
+                        else if (item[currentPlatform]) {
+                            signalList.push(item[currentPlatform]);
+                        } else if (key === currentPlatform && item.pair) {
+                            signalList.push(item);
+                        }
                     }
                 });
             }
             
-            // 2. Dynamic Fallback System using new assets
+            // Dynamic Fallback System
             if (signalList.length === 0) {
                 let defaultExpiry = currentPlatform === 'binomo' ? '5 Min' : (currentPlatform === 'quotex' ? '1 Min' : '3 Min');
-                
-                // Screenshots ke standard aur customized assets ko placeholder list banaya
                 let imageFallbackKeys = ['CRYPTOIDX', 'EURUSD', 'AUDCAD', 'USDJPY'];
                 imageFallbackKeys.forEach((key, index) => {
                     if (supportedPairs[key]) {
@@ -182,15 +179,21 @@
             if (currentPlatform === 'binomo') sideColor = '#ffea00';
             if (currentPlatform === 'olymp') sideColor = '#00b0ff';
 
-            // DOM Insertion Loop
             signalList.forEach(sig => {
                 if(sig && sig.pair && sig.type) {
                     const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call') || sig.type.toLowerCase().includes('buy');
                     const dirClass = isUp ? 'up-signal' : 'down-signal';
 
+                    // Formatting clean name mapping
+                    let cleanPair = sig.pair;
+                    let upperKey = sig.pair.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+                    if (supportedPairs[upperKey]) {
+                        cleanPair = supportedPairs[upperKey];
+                    }
+
                     const cardHtml = `
                         <div class="signal-card" style="border-left-color: ${sideColor}">
-                            <p class="pair-title">${sig.pair}</p>
+                            <p class="pair-title">${cleanPair}</p>
                             <div style="display:flex; justify-content:space-between; margin-top:15px; font-size: 14px;">
                                 <span>Type: <span class="${dirClass}">${sig.type}</span></span>
                                 <span style="color: #b0b9cd;">Expiry: <b>${sig.expiry}</b></span>
