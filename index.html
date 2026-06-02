@@ -26,8 +26,8 @@
         #signals-container { display: flex; flex-direction: column; gap: 12px; }
         .signal-card { background: #171c26; border-radius: 12px; padding: 22px; border-left: 5px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; animation: fadeIn 0.5s ease-in-out; }
         .pair-title { font-size: 19px; font-weight: bold; margin: 0; text-align: left; }
-        .up-signal { color: #00e676; font-weight: bold; }
-        .down-signal { color: #ff5252; font-weight: bold; }
+        .up-signal { color: #00e676; font-weight: bold; text-transform: uppercase; }
+        .down-signal { color: #ff5252; font-weight: bold; text-transform: uppercase; }
         .no-signals { padding: 30px; color: #8895b3; font-size: 14px; background: #171c26; border-radius: 12px; border: 1px dashed #283042; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -66,9 +66,8 @@
         let currentPlatform = 'binomo';
         let firebaseData = {};
 
-        // Aapki bheji hui saari currencies permanently yahan add kar di gayi hain
+        // Aapki saari yaad ki hui currencies
         const supportedPairs = {
-            // --- NORMAL / STANDARD PAIRS ---
             "AUDCAD": "AUD/CAD", "AUDCHF": "AUD/CHF", "AUDJPY": "AUD/JPY", "AUDNZD": "AUD/NZD", "AUDUSD": "AUD/USD",
             "CADDKK": "CAD/DKK", "CADJPY": "CAD/JPY", "CADMXN": "CAD/MXN", "CADNOK": "CAD/NOK", "CADSEK": "CAD/SEK", "CADSGD": "CAD/SGD",
             "CHFDKK": "CHF/DKK", "CHFJPY": "CHF/JPY", "CHFNOK": "CHF/NOK", "CHFPLN": "CHF/PLN", "CHFSEK": "CHF/SEK", "CHFSGD": "CHF/SGD",
@@ -78,7 +77,6 @@
             "USDCAD": "USD/CAD", "USDCHF": "USD/CHF", "USDCZK": "USD/CZK", "USDHUF": "USD/HUF", "USDILS": "USD/ILS", "USDJPY": "USD/JPY", "USDMXN": "USD/MXN", "USDPLN": "USD/PLN", "USDSEK": "USD/SEK", "USDZAR": "USD/ZAR",
             "ZARJPY": "ZAR/JPY",
 
-            // --- OTC PAIRS ---
             "AUDCADOTC": "AUD/CAD OTC", "AUDCHFOTC": "AUD/CHF OTC", "AUDJPYOTC": "AUD/JPY OTC", "AUDNZDOTC": "AUD/NZD OTC", "AUDUSDOTC": "AUD/USD OTC",
             "CADCHFOTC": "CAD/CHF OTC", "CADJPYOTC": "CAD/JPY OTC", "CHFJPYOTC": "CHF/JPY OTC",
             "EURAUDOTC": "EUR/AUD OTC", "EURCADOTC": "EUR/CAD OTC", "EURCHFOTC": "EUR/CHF OTC", "EURGBPOTC": "EUR/GBP OTC", "EURJPYOTC": "EUR/JPY OTC", "EURNZDOTC": "EUR/NZD OTC", "EURUSDOTC": "EUR/USD OTC",
@@ -87,14 +85,11 @@
             "USDARSOTC": "USD/ARS OTC", "USDBDTOTC": "USD/BDT OTC", "USDBRLOTC": "USD/BRL OTC", "USDCHFOTC": "USD/CHF OTC", "USDCOPOTC": "USD/COP OTC", "USDDZDOTC": "USD/DZD OTC", "USDEGPOTC": "USD/EGP OTC", "USDIDROTC": "USD/IDR OTC", "USDINROTC": "USD/INR OTC", "USDJPYOTC": "USD/JPY OTC", "USDMXNOTC": "USD/MXN OTC", "USDNGNOTC": "USD/NGN OTC", "USDPHPOTC": "USD/PHP OTC", "USDPKROTC": "USD/PKR OTC", "USDZAROTC": "USD/ZAR OTC",
             "GOLDOTC": "GOLD OTC", "SILVEROTC": "SILVER OTC",
 
-            // --- CRYPTO & INDICES ---
             "BTCUSD": "Bitcoin", "BITCOIN": "Bitcoin", "BITCOINCASHOTC": "Bitcoin Cash (OTC)", "BITCOINOTC": "Bitcoin OTC",
             "DOGECOINOTC": "Dogecoin OTC", "ETHEREUMOTC": "Ethereum OTC", "LITECOINOTC": "Litecoin OTC", "RIPPLEOTC": "Ripple OTC",
             "SOLANAOTC": "Solana OTC", "TONCOINOTC": "Toncoin (OTC)", "UNISWAPOTC": "Uniswap (OTC)", "PANCAKESWAPOTC": "Pancake Swap (OTC)",
             "CARDANO": "Cardano", "CHAINLINK": "Chainlink",
             "ASIACOMPOSITEINDEX": "Asia Composite Index", "QUICKLER": "Quickler", "STABLETICKINDEX": "Stable Tick Index",
-
-            // --- BACKUP ALIASES ---
             "SAXOCADSEK": "CAD/SEK", "CADSEK": "CAD/SEK", "CRYPTOIDX": "Crypto IDX"
         };
 
@@ -108,24 +103,28 @@
         function renderSignals() {
             const container = document.getElementById('signals-container');
             container.innerHTML = '';
-            let signalList = [];
+            let rawSignals = [];
 
             if (firebaseData && typeof firebaseData === 'object') {
                 Object.keys(firebaseData).forEach(key => {
                     let item = firebaseData[key];
                     if (item) {
                         if (item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
-                            signalList.push(item);
+                            rawSignals.push(item);
                         } else if (item[currentPlatform] && item[currentPlatform].pair) {
-                            signalList.push(item[currentPlatform]);
+                            rawSignals.push(item[currentPlatform]);
                         } else if (key.toLowerCase() === currentPlatform.toLowerCase() && item.pair) {
-                            signalList.push(item);
+                            rawSignals.push(item);
+                        } else if (item.pair && key.toUpperCase() === item.pair.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()) {
+                            if (item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
+                                rawSignals.push(item);
+                            }
                         }
                     }
                 });
             }
             
-            if (signalList.length === 0) {
+            if (rawSignals.length === 0) {
                 container.innerHTML = '<div class="no-signals">⏳ Waiting for live TradingView Alerts...</div>';
                 return;
             }
@@ -134,10 +133,23 @@
             if (currentPlatform === 'quotex') sideColor = '#00e676';
             if (currentPlatform === 'olymp') sideColor = '#00b0ff';
 
-            signalList.forEach(sig => {
+            // --- DE-DUPLICATION LOGIC (Yeh duplicate pairs ko block karega) ---
+            let finalSignals = {};
+            rawSignals.forEach(sig => {
+                if(sig && sig.pair) {
+                    let pKey = sig.pair.toUpperCase().replace(/[^a-zA-Z0-9]/g, "");
+                    // Yeh hamesha latest signal ko hi rakhega
+                    finalSignals[pKey] = sig; 
+                }
+            });
+
+            // Ab filtered signals ko screen par print karenge
+            Object.values(finalSignals).forEach(sig => {
                 if(sig && sig.pair && sig.type) {
-                    const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call');
+                    const typeText = sig.type.toUpperCase();
+                    const isUp = typeText.includes('UP') || typeText.includes('CALL') || typeText.includes('BUY');
                     const dirClass = isUp ? 'up-signal' : 'down-signal';
+                    const displayType = isUp ? '🟢 CALL / UP' : '🔴 PUT / DOWN';
 
                     let cleanPair = sig.pair;
                     let upperKey = sig.pair.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -149,7 +161,7 @@
                         <div class="signal-card" style="border-left-color: ${sideColor}">
                             <p class="pair-title">${cleanPair}</p>
                             <div style="display:flex; justify-content:space-between; margin-top:15px; font-size: 14px;">
-                                <span>Type: <span class="${dirClass}">${sig.type}</span></span>
+                                <span>Type: <span class="${dirClass}">${displayType}</span></span>
                                 <span style="color: #b0b9cd;">Expiry: <b>${sig.expiry}</b></span>
                             </div>
                         </div>
