@@ -27,13 +27,15 @@
 
         /* Tabs Styling */
         .tab-container { display: flex; justify-content: space-around; background: #171c26; border-radius: 12px; padding: 6px; margin-bottom: 20px; border: 1px solid #283042; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #8895b3; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: #8895b3; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: all 0.3s ease; }
+        
+        /* Fixed Active State Colors */
         .tab-btn.active[data-platform="quotex"] { background: #00e676; color: #000; }
         .tab-btn.active[data-platform="binomo"] { background: #ffea00; color: #000; }
         .tab-btn.active[data-platform="olymp"] { background: #00b0ff; color: #fff; }
 
         /* Signals Display Card */
-        .signal-card { background: #171c26; border-radius: 12px; padding: 22px; border-left: 5px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .signal-card { background: #171c26; border-radius: 12px; padding: 22px; border-left: 5px solid #283042; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; }
         .pair-title { font-size: 19px; font-weight: bold; margin: 0; text-align: left; }
         .up-signal { color: #00e676; font-weight: bold; }
         .down-signal { color: #ff5252; font-weight: bold; }
@@ -89,9 +91,14 @@
             const container = document.getElementById('signals-container');
             container.innerHTML = '';
             
-            let sig = (allSignals[currentPlatform] ? allSignals[currentPlatform].actual : null);
+            // Fixed: Pehle seedha platform key check karega, agar usme data nahi hai toh fallback system chalega
+            let sig = null;
+            if (allSignals && allSignals[currentPlatform]) {
+                sig = allSignals[currentPlatform].actual ? allSignals[currentPlatform].actual : allSignals[currentPlatform];
+            }
             
-            if (!sig) {
+            // Fallback (Agar database khali ho toh default signals dikhane ke liye)
+            if (!sig || !sig.pair) {
                 if (currentPlatform === 'quotex') {
                     sig = { pair: "AUD/USD (OTC)", type: "CALL / UP 📈", expiry: "1 Min" };
                 } else if (currentPlatform === 'binomo') {
@@ -101,7 +108,7 @@
                 }
             }
             
-            const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call');
+            const isUp = sig.type.toLowerCase().includes('up') || sig.type.toLowerCase().includes('call') || sig.type.toLowerCase().includes('buy');
             const dirClass = isUp ? 'up-signal' : 'down-signal';
             
             let sideColor = '#00e676';
@@ -127,11 +134,12 @@
                     renderSignals(); 
                 })
                 .catch(err => {
-                    console.error(err);
+                    console.error("Firebase Fetch Error:", err);
                     renderSignals();
                 });
         }
 
+        // Har 3 seconds mein data automatic auto-refresh hoga
         setInterval(fetchSignals, 3000);
         fetchSignals();
     </script>
