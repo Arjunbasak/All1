@@ -66,9 +66,36 @@
         let currentPlatform = 'binomo';
         let firebaseData = {};
 
+        // Aapki bheji hui saari currencies permanently yahan add kar di gayi hain
         const supportedPairs = {
-            "SAXOCADSEK": "CAD/SEK", "CADSEK": "CAD/SEK",
-            "CRYPTOIDX": "Crypto IDX", "AUDCAD": "AUD/CAD", "EURUSD": "EUR/USD", "USDJPY": "USD/JPY"
+            // --- NORMAL / STANDARD PAIRS ---
+            "AUDCAD": "AUD/CAD", "AUDCHF": "AUD/CHF", "AUDJPY": "AUD/JPY", "AUDNZD": "AUD/NZD", "AUDUSD": "AUD/USD",
+            "CADDKK": "CAD/DKK", "CADJPY": "CAD/JPY", "CADMXN": "CAD/MXN", "CADNOK": "CAD/NOK", "CADSEK": "CAD/SEK", "CADSGD": "CAD/SGD",
+            "CHFDKK": "CHF/DKK", "CHFJPY": "CHF/JPY", "CHFNOK": "CHF/NOK", "CHFPLN": "CHF/PLN", "CHFSEK": "CHF/SEK", "CHFSGD": "CHF/SGD",
+            "EURAUD": "EUR/AUD", "EURCAD": "EUR/CAD", "EURCHF": "EUR/CHF", "EURGBP": "EUR/GBP", "EURHUF": "EUR/HUF", "EURILS": "EUR/ILS", "EURJPY": "EUR/JPY", "EURNZD": "EUR/NZD", "EURPLN": "EUR/PLN", "EURUSD": "EUR/USD",
+            "GBPAUD": "GBP/AUD", "GBPCAD": "GBP/CAD", "GBPCHF": "GBP/CHF", "GBPHUF": "GBP/HUF", "GBPJPY": "GBP/JPY", "GBPNZD": "GBP/NZD", "GBPUSD": "GBP/USD",
+            "NZDCAD": "NZD/CAD", "NZDCHF": "NZD/CHF", "NZDJPY": "NZD/JPY", "NZDSEK": "NZD/SEK", "NZDSGD": "NZD/SGD", "NZDUSD": "NZD/USD",
+            "USDCAD": "USD/CAD", "USDCHF": "USD/CHF", "USDCZK": "USD/CZK", "USDHUF": "USD/HUF", "USDILS": "USD/ILS", "USDJPY": "USD/JPY", "USDMXN": "USD/MXN", "USDPLN": "USD/PLN", "USDSEK": "USD/SEK", "USDZAR": "USD/ZAR",
+            "ZARJPY": "ZAR/JPY",
+
+            // --- OTC PAIRS ---
+            "AUDCADOTC": "AUD/CAD OTC", "AUDCHFOTC": "AUD/CHF OTC", "AUDJPYOTC": "AUD/JPY OTC", "AUDNZDOTC": "AUD/NZD OTC", "AUDUSDOTC": "AUD/USD OTC",
+            "CADCHFOTC": "CAD/CHF OTC", "CADJPYOTC": "CAD/JPY OTC", "CHFJPYOTC": "CHF/JPY OTC",
+            "EURAUDOTC": "EUR/AUD OTC", "EURCADOTC": "EUR/CAD OTC", "EURCHFOTC": "EUR/CHF OTC", "EURGBPOTC": "EUR/GBP OTC", "EURJPYOTC": "EUR/JPY OTC", "EURNZDOTC": "EUR/NZD OTC", "EURUSDOTC": "EUR/USD OTC",
+            "GBPAUDOTC": "GBP/AUD OTC", "GBPCADOTC": "GBP/CAD OTC", "GBPCHFOTC": "GBP/CHF OTC", "GBPJPYOTC": "GBP/JPY OTC", "GBPNZDOTC": "GBP/NZD OTC", "GBPUSDOTC": "GBP/USD OTC",
+            "NZDCADOTC": "NZD/CAD OTC", "NZDCHFOTC": "NZD/CHF OTC", "NZDJPYOTC": "NZD/JPY OTC", "NZDUSDOTC": "NZD/USD OTC",
+            "USDARSOTC": "USD/ARS OTC", "USDBDTOTC": "USD/BDT OTC", "USDBRLOTC": "USD/BRL OTC", "USDCHFOTC": "USD/CHF OTC", "USDCOPOTC": "USD/COP OTC", "USDDZDOTC": "USD/DZD OTC", "USDEGPOTC": "USD/EGP OTC", "USDIDROTC": "USD/IDR OTC", "USDINROTC": "USD/INR OTC", "USDJPYOTC": "USD/JPY OTC", "USDMXNOTC": "USD/MXN OTC", "USDNGNOTC": "USD/NGN OTC", "USDPHPOTC": "USD/PHP OTC", "USDPKROTC": "USD/PKR OTC", "USDZAROTC": "USD/ZAR OTC",
+            "GOLDOTC": "GOLD OTC", "SILVEROTC": "SILVER OTC",
+
+            // --- CRYPTO & INDICES ---
+            "BTCUSD": "Bitcoin", "BITCOIN": "Bitcoin", "BITCOINCASHOTC": "Bitcoin Cash (OTC)", "BITCOINOTC": "Bitcoin OTC",
+            "DOGECOINOTC": "Dogecoin OTC", "ETHEREUMOTC": "Ethereum OTC", "LITECOINOTC": "Litecoin OTC", "RIPPLEOTC": "Ripple OTC",
+            "SOLANAOTC": "Solana OTC", "TONCOINOTC": "Toncoin (OTC)", "UNISWAPOTC": "Uniswap (OTC)", "PANCAKESWAPOTC": "Pancake Swap (OTC)",
+            "CARDANO": "Cardano", "CHAINLINK": "Chainlink",
+            "ASIACOMPOSITEINDEX": "Asia Composite Index", "QUICKLER": "Quickler", "STABLETICKINDEX": "Stable Tick Index",
+
+            // --- BACKUP ALIASES ---
+            "SAXOCADSEK": "CAD/SEK", "CADSEK": "CAD/SEK", "CRYPTOIDX": "Crypto IDX"
         };
 
         function switchPlatform(platform) {
@@ -87,7 +114,6 @@
                 Object.keys(firebaseData).forEach(key => {
                     let item = firebaseData[key];
                     if (item) {
-                        // Check direct platform match or nested objects
                         if (item.platform && item.platform.toLowerCase() === currentPlatform.toLowerCase()) {
                             signalList.push(item);
                         } else if (item[currentPlatform] && item[currentPlatform].pair) {
@@ -99,7 +125,6 @@
                 });
             }
             
-            // Agar koi live signal nahi hai, toh hi screen khaali dikhegi (No dummy cards)
             if (signalList.length === 0) {
                 container.innerHTML = '<div class="no-signals">⏳ Waiting for live TradingView Alerts...</div>';
                 return;
